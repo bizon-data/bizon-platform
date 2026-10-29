@@ -133,25 +133,44 @@ export function PipelineCreatePage() {
       ? formData.scheduleCustom
       : formData.schedulePreset
 
+    // The form only edits a few fields; keep everything else (auth, transforms, engine, source
+    // options) from the stored config so saving doesn't wipe settings made through the API.
+    const existing = isEditMode ? pipeline?.config : undefined
+    const sourceName = isCustom ? formData.customSourceName : formData.sourceName
+    const sourceStream = isCustom ? formData.customSourceStream : formData.sourceStream
+    const existingSource =
+      existing?.source &&
+      existing.source.name === sourceName &&
+      existing.source.stream === sourceStream &&
+      !!existing.source.source_file_path === isCustom
+        ? existing.source
+        : undefined
+    const existingDestination =
+      existing?.destination?.name === formData.destinationName ? existing.destination : undefined
+
     const request: CreatePipelineRequest = {
       name: formData.name,
       config: {
+        ...existing,
         name: formData.name,
         source: isCustom
           ? {
+              ...existingSource,
               source_file_path: formData.customSourceFilePath,
-              name: formData.customSourceName,
-              stream: formData.customSourceStream,
+              name: sourceName,
+              stream: sourceStream,
             }
           : {
-              name: formData.sourceName,
-              stream: formData.sourceStream,
-              authentication: {
+              ...existingSource,
+              name: sourceName,
+              stream: sourceStream,
+              authentication: existingSource?.authentication ?? {
                 type: 'api_key',
                 params: { token: 'placeholder' },
               },
             },
         destination: {
+          ...existingDestination,
           name: formData.destinationName,
           config: formData.destinationConfig,
         },

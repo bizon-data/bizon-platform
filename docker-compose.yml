@@ -25,6 +25,9 @@ services:
       target: backend
     ports:
       - "8000:8000"
+    env_file:
+      - path: .env
+        required: false
     environment:
       DATABASE_URL: postgresql+asyncpg://bizon:bizon@db:5432/bizon_platform
       STORAGE_LOCAL_PATH: /tmp/bizon-outputs
@@ -44,6 +47,9 @@ services:
     build:
       context: .
       target: backend
+    env_file:
+      - path: .env
+        required: false
     environment:
       DATABASE_URL: postgresql+asyncpg://bizon:bizon@db:5432/bizon_platform
       STORAGE_LOCAL_PATH: /tmp/bizon-outputs
@@ -65,7 +71,7 @@ services:
       context: .
       target: ui
     ports:
-      - "3000:80"
+      - "3000:8080"
     depends_on:
       - api
 
@@ -83,6 +89,9 @@ services:
       - ./bizon_platform:/app/bizon_platform
       - ./custom_sources:/custom_sources
       - bizon_outputs:/tmp/bizon-outputs
+    env_file:
+      - path: .env
+        required: false
     environment:
       DATABASE_URL: postgresql+asyncpg://bizon:bizon@db:5432/bizon_platform
       STORAGE_LOCAL_PATH: /tmp/bizon-outputs
@@ -104,6 +113,9 @@ services:
       - ./bizon_platform:/app/bizon_platform
       - ./custom_sources:/custom_sources
       - bizon_outputs:/tmp/bizon-outputs
+    env_file:
+      - path: .env
+        required: false
     environment:
       DATABASE_URL: postgresql+asyncpg://bizon:bizon@db:5432/bizon_platform
       STORAGE_LOCAL_PATH: /tmp/bizon-outputs

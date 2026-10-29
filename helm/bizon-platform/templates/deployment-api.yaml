@@ -64,19 +64,26 @@ spec:
                   name: {{ include "bizon-platform.encryptionKeySecretName" . }}
                   key: encryption-key
                   optional: true
-            {{- if .Values.security.adminPassword }}
+            {{- if or .Values.security.adminPassword .Values.security.existingAdminPasswordSecret }}
             - name: ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: {{ include "bizon-platform.adminPasswordSecretName" . }}
                   key: admin-password
             {{- end }}
-            {{- if and .Values.gitSync.enabled .Values.gitSync.token }}
+            {{- if and .Values.gitSync.enabled (or .Values.gitSync.token .Values.gitSync.existingTokenSecret) }}
             - name: GIT_SYNC_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: {{ include "bizon-platform.gitTokenSecretName" . }}
                   key: git-token
+            {{- end }}
+            {{- if and .Values.gitSync.enabled (or .Values.gitSync.webhookSecret .Values.gitSync.existingWebhookSecret) }}
+            - name: GIT_SYNC_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "bizon-platform.gitWebhookSecretName" . }}
+                  key: git-webhook-secret
             {{- end }}
           envFrom:
             - configMapRef:

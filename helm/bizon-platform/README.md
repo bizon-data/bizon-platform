@@ -82,7 +82,7 @@ helm install bizon ./helm/bizon-platform \
 kubectl get pods -l "app.kubernetes.io/instance=bizon" -w
 
 # Port forward UI
-kubectl port-forward svc/bizon-bizon-platform-ui 3000:80
+kubectl port-forward svc/bizon-bizon-platform-ui 3000:8080
 ```
 
 ## Configuration
@@ -186,7 +186,7 @@ See `values-production.yaml` for production-ready settings including:
 | `ui.image.repository` | UI image | `ghcr.io/bizon-data/bizon-platform-ui` |
 | `ui.image.tag` | UI image tag | `latest` |
 | `ui.replicaCount` | Number of replicas | `1` |
-| `ui.service.port` | Service port | `80` |
+| `ui.service.port` | Service port | `8080` |
 
 ### Security
 

@@ -1,6 +1,6 @@
 # Bizon
 
-A lightweight, single-tenant platform for running data pipelines. No authentication required.
+A lightweight, single-tenant platform for running data pipelines. Set `ADMIN_PASSWORD` to require HTTP Basic auth.
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/bizon-data/bizon-platform)
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/bizon-data/bizon-platform)
@@ -276,7 +276,7 @@ Install from GHCR using the Helm chart:
 helm install bizon oci://ghcr.io/bizon-data/charts/bizon-platform
 
 # Access the UI
-kubectl port-forward svc/bizon-bizon-platform-ui 3000:80
+kubectl port-forward svc/bizon-bizon-platform-ui 3000:8080
 open http://localhost:3000
 ```
 
@@ -284,7 +284,7 @@ Pre-built images are available at:
 - `ghcr.io/bizon-data/bizon-platform` (API + Worker)
 - `ghcr.io/bizon-data/bizon-platform-ui` (UI)
 
-See [helm/bizon-platform/README.md](helm/bizon-platform/README.md) for full configuration options and [docs/enterprise-deployment.md](docs/enterprise-deployment.md) for multi-tenant setups.
+See [helm/bizon-platform/README.md](helm/bizon-platform/README.md) for full configuration options.
 
 ## Architecture
 
@@ -378,4 +378,4 @@ uv run mypy bizon_platform
 
 ## License
 
-MIT
+GPL-3.0. See [LICENSE](LICENSE).
