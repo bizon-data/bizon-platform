@@ -6,6 +6,7 @@ import hmac
 import importlib.util
 import logging
 import os
+import re
 import shutil
 import zipfile
 from io import BytesIO
@@ -105,11 +106,21 @@ class GitSyncWebhookResponse(BaseModel):
     message: str
 
 
+_SOURCE_NAME_RE = re.compile(r"^[A-Za-z0-9_]+$")
+
+
+def _source_dir(name: str) -> str:
+    """Return the directory of a custom source, rejecting names that could escape the sources dir."""
+    if not _SOURCE_NAME_RE.match(name):
+        raise HTTPException(status_code=400, detail=f"Invalid source name '{name}'")
+    return os.path.join(settings.custom_sources_dir, name)
+
+
 def _get_source_class(source_name: str):
     """Load and return the source class from a custom source."""
     from bizon.source.source import AbstractSource
 
-    source_dir = os.path.join(settings.custom_sources_dir, source_name)
+    source_dir = _source_dir(source_name)
     source_file = os.path.join(source_dir, "source.py")
 
     if not os.path.exists(source_file):
@@ -138,7 +149,7 @@ def _get_source_class(source_name: str):
 @router.get("/{name}/code", response_model=SourceCodeResponse)
 async def get_source_code(name: str) -> SourceCodeResponse:
     """Get the source code for a custom source."""
-    source_dir = os.path.join(settings.custom_sources_dir, name)
+    source_dir = _source_dir(name)
     source_file = os.path.join(source_dir, "source.py")
 
     if not os.path.exists(source_file):
@@ -336,7 +347,7 @@ async def upload_source(file: UploadFile = File(...)) -> UploadResponse:
     if file.filename.endswith(".py"):
         # Single Python file upload
         source_name = file.filename.replace(".py", "").replace("-", "_").lower()
-        source_dir = os.path.join(settings.custom_sources_dir, source_name)
+        source_dir = _source_dir(source_name)
 
         if os.path.exists(source_dir):
             raise HTTPException(status_code=400, detail=f"Source '{source_name}' already exists")
@@ -372,7 +383,7 @@ async def upload_source(file: UploadFile = File(...)) -> UploadResponse:
                 else:
                     source_name = file.filename.replace(".zip", "").replace("-", "_").lower()
 
-                source_dir = os.path.join(settings.custom_sources_dir, source_name)
+                source_dir = _source_dir(source_name)
 
                 if os.path.exists(source_dir):
                     raise HTTPException(status_code=400, detail=f"Source '{source_name}' already exists")
@@ -434,7 +445,7 @@ async def upload_source(file: UploadFile = File(...)) -> UploadResponse:
 @router.delete("/{name}", response_model=DeleteResponse)
 async def delete_source(name: str) -> DeleteResponse:
     """Delete a custom source."""
-    source_dir = os.path.join(settings.custom_sources_dir, name)
+    source_dir = _source_dir(name)
 
     if not os.path.exists(source_dir):
         raise HTTPException(status_code=404, detail=f"Custom source '{name}' not found")

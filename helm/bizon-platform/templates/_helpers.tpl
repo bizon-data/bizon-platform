@@ -227,6 +227,17 @@ Git token secret name
 {{- end }}
 
 {{/*
+Git webhook secret name
+*/}}
+{{- define "bizon-platform.gitWebhookSecretName" -}}
+{{- if .Values.gitSync.existingWebhookSecret }}
+{{- .Values.gitSync.existingWebhookSecret }}
+{{- else }}
+{{- printf "%s-secrets" (include "bizon-platform.fullname" .) }}
+{{- end }}
+{{- end }}
+
+{{/*
 CORS allowed origins as JSON array string
 */}}
 {{- define "bizon-platform.corsAllowedOrigins" -}}

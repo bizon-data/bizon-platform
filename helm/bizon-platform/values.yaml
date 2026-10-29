@@ -178,6 +178,10 @@ gitSync:
   token: ""
   # -- Use existing secret for token (key: git-token)
   existingTokenSecret: ""
+  # -- Secret shared with the GitHub/GitLab push webhook
+  webhookSecret: ""
+  # -- Use existing secret for the webhook secret (key: git-webhook-secret)
+  existingWebhookSecret: ""
 
 # -- Storage configuration
 storage:

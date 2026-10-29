@@ -2,6 +2,7 @@
 
 When ADMIN_PASSWORD is set, all API endpoints (except health check) require
 HTTP Basic Authentication with any username and the configured password.
+The git sync webhook is also exempt: it authenticates with its own signature.
 
 This is intended for simple deployments without a reverse proxy.
 For production, consider using a reverse proxy (nginx, Cloudflare, etc.)
@@ -16,6 +17,12 @@ from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from bizon_platform.settings import settings
 
 security = HTTPBasic(auto_error=False)
+
+UNAUTHENTICATED_PATHS = {
+    "/api/health",
+    # GitHub/GitLab can't send Basic credentials; the route verifies GIT_SYNC_WEBHOOK_SECRET instead.
+    "/api/custom-sources/git-sync/webhook",
+}
 
 
 async def optional_auth(
@@ -33,8 +40,7 @@ async def optional_auth(
     if not settings.admin_password:
         return
 
-    # Always allow health checks (for k8s probes, monitoring, etc.)
-    if request.url.path == "/api/health":
+    if request.url.path in UNAUTHENTICATED_PATHS:
         return
 
     # Require valid credentials

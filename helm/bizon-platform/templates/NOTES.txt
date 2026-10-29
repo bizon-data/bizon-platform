@@ -56,7 +56,7 @@ Generate a key: python -c "from cryptography.fernet import Fernet; print(Fernet.
 {{- end }}
 {{- end }}
 
-{{- if .Values.security.adminPassword }}
+{{- if or .Values.security.adminPassword .Values.security.existingAdminPasswordSecret }}
 
 Basic authentication is ENABLED.
 Username: admin
